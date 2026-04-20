@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace BoxMenu
 {
@@ -91,7 +89,7 @@ namespace BoxMenu
             bool blocked = false;
 
             // Go in reverse order, so upper buttons block lower buttons.
-            for (int i = buttons.Count-1; i >= 0; i--)
+            for (int i = buttons.Count - 1; i >= 0; i--)
             {
                 if (buttons[i].Update(nowState, blocked, Offset))
                     blocked = true;

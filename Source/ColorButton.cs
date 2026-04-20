@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -61,7 +58,8 @@ namespace BoxMenu
             ActionDelegate ad, params object[] arguments)
             : this(rectangle, texture,
             colorArray[0], colorArray[1], colorArray[2], colorArray[3],
-            ad, arguments) { }
+            ad, arguments)
+        { }
 
         internal override void UpdateAppearance()
         {
