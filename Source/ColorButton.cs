@@ -8,7 +8,7 @@ namespace BoxMenu
     /// A button whose states are described by different color highlights
     /// over the same Texture2D.
     /// </summary>
-    public class ColorButton : AbstractButton
+    public class ColorButton : AbstractClickableButton
     {
         /// <summary>
         /// Texture

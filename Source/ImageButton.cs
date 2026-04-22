@@ -7,7 +7,7 @@ namespace BoxMenu
     /// <summary>
     /// A button whose four states are described by four separate Texture2Ds.
     /// </summary>
-    public class ImageButton : AbstractButton
+    public class ImageButton : AbstractClickableButton
     {
         private Texture2D inactiveTexture, activeTexture, hoverTexture, clickTexture;
 

@@ -1,70 +1,51 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace BoxMenu
 {
 
-    public enum ActivationCondition
-    {
-        OnPress,
-        OnRelease
-    }
-
     /// <summary>
     /// An abstract button.
     /// </summary>
-    public abstract class AbstractButton
+    public abstract class AbstractClickableButton : AbstractButtonFramework
     {
-        internal enum BoxButtonState
-        {
-            Inactive,
-            Active,
-            Clicking,
-            Hovering
-        }
-
-        internal BoxButtonState state = BoxButtonState.Active;
-
-        private int clickTimer = 0;
+        internal int clickTimer = 0;
 
         internal int TIMER_MAX = 2;
-
-        private object[] arguments;
-
-        /// <summary>
-        /// This box contains the on-screen position and dimensions of the button.
-        /// </summary>
-        public Rectangle BoundingBox { get; internal set; }
-        internal Rectangle origBoundingBox;
-
-        /// <summary>
-        /// Gets or sets whether this button is enabled.
-        /// </summary>
-        public bool Enabled { get; set; }
 
         /// <summary>
         /// Gets or sets whether this button is visible.
         /// </summary>
         public bool Visible { get; set; }
-
-        public ActivationCondition ActivationCondition { get; set; }
-
-        internal ButtonCollection soloCollection;
-
         /// <summary>
-        /// Update only this button. Do not use if also updating button through a ButtonCollection.
+        /// The function to run when clicked.
         /// </summary>
-        public void Update()
-        {
-            soloCollection.Update();
-        }
+        internal ActionDelegate actionDelegate;
 
         /// <summary>
         /// This event is called when the mouse is clicked while selecting the item.
         /// </summary>
-        internal bool InternalUpdate(MouseState nowState, bool blocked, Point offset)
+        internal override bool InternalUpdate(MouseState nowState, MouseState prevState, bool blocked, Point offset)
         {
+            ButtonState mouseTrigger;
+
+            switch (MouseTrigger)
+            {
+                case MouseAction.LeftClick:
+                    mouseTrigger = nowState.LeftButton;
+                    break;
+                case MouseAction.RightClick:
+                    mouseTrigger = nowState.RightButton;
+                    break;
+                case MouseAction.MiddleClick:
+                    mouseTrigger = nowState.MiddleButton;
+                    break;
+                default:
+                    throw new NotImplementedException("Mouse scrolling not yet implemented");
+            }
+
             BoundingBox = new Rectangle(origBoundingBox.Location + offset, origBoundingBox.Size);
 
             bool blocking = false;
@@ -98,20 +79,20 @@ namespace BoxMenu
 
             else
             {
-                if (contains && nowState.LeftButton == ButtonState.Pressed && state == BoxButtonState.Hovering)
+                if (contains && mouseTrigger == ButtonState.Pressed && state == BoxButtonState.Hovering)
                 {
                     blocking = true;
                     state = BoxButtonState.Clicking;
                     if (ActivationCondition == ActivationCondition.OnPress)
                         clickTimer = TIMER_MAX;
                 }
-                else if (state == BoxButtonState.Clicking && nowState.LeftButton == ButtonState.Released)
+                else if (state == BoxButtonState.Clicking && mouseTrigger == ButtonState.Released)
                 {
                     blocking = true;
                     if (ActivationCondition == ActivationCondition.OnRelease)
                         clickTimer = TIMER_MAX;
                 }
-                else if (contains && nowState.LeftButton == ButtonState.Released)
+                else if (contains && mouseTrigger == ButtonState.Released)
                 {
                     blocking = true;
                     state = BoxButtonState.Hovering;
@@ -126,25 +107,8 @@ namespace BoxMenu
 
             return blocking;
         }
-        /// <summary>
-        /// Update the appearance of the button
-        /// </summary>
-        internal abstract void UpdateAppearance();
 
-        public abstract void Draw(SpriteBatch spriteBatch);
-
-        /// <summary>
-        /// A delegate with no return type which takes a
-        /// "params" array of objects.
-        /// </summary>
-        /// <param name="args"></param>
-        public delegate void ActionDelegate(params object[] args);
-        /// <summary>
-        /// The function to run when clicked.
-        /// </summary>
-        private ActionDelegate actionDelegate;
-
-        internal AbstractButton(Rectangle rectangle,
+        internal AbstractClickableButton(Rectangle rectangle,
             ActionDelegate actionDelegate, params object[] arguments)
         {
             origBoundingBox = rectangle;
@@ -157,17 +121,6 @@ namespace BoxMenu
 
             soloCollection = new ButtonCollection();
             soloCollection.Add(this);
-        }
-
-        /// <summary>
-        /// Re-set the parameters of this button.  Useful when
-        /// an argument is a reference which may have changed
-        /// since initialization.
-        /// </summary>
-        /// <param name="arguments"></param>
-        public void SetArguments(params object[] arguments)
-        {
-            this.arguments = arguments;
         }
     }
 }

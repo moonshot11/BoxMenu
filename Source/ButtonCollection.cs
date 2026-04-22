@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BoxMenu
 {
@@ -10,7 +11,7 @@ namespace BoxMenu
     /// </summary>
     public class ButtonCollection
     {
-        private List<AbstractButton> buttons = new List<AbstractButton>();
+        private List<AbstractButtonFramework> buttons = [];
         private MouseState nowState, prevState;
 
         /// <summary>
@@ -18,21 +19,13 @@ namespace BoxMenu
         /// </summary>
         public Point Offset;
 
-        internal int TIMER_MAX = 2;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="click_timer">How long the button should stay pressed after click.</param>
-        public ButtonCollection(int click_timer)
-        {
-            TIMER_MAX = click_timer;
-        }
-
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public ButtonCollection() { }
+        public ButtonCollection() {
+            nowState = Mouse.GetState();
+            prevState = Mouse.GetState();
+        }
 
         /// <summary>
         /// Gets the number of buttons in this collection.
@@ -46,17 +39,16 @@ namespace BoxMenu
         /// Add a button to this collection.
         /// </summary>
         /// <param name="button"></param>
-        public void Add(AbstractButton button)
+        public void Add(AbstractButtonFramework button)
         {
             buttons.Add(button);
-            button.TIMER_MAX = TIMER_MAX;
         }
 
         /// <summary>
         /// Remove a button from the collection.
         /// </summary>
         /// <param name="button"></param>
-        public void Remove(AbstractButton button)
+        public void Remove(AbstractButtonFramework button)
         {
             buttons.Remove(button);
         }
@@ -91,7 +83,7 @@ namespace BoxMenu
             // Go in reverse order, so upper buttons block lower buttons.
             for (int i = buttons.Count - 1; i >= 0; i--)
             {
-                if (buttons[i].InternalUpdate(nowState, blocked, Offset))
+                if (buttons[i].InternalUpdate(nowState, prevState, blocked, Offset))
                     blocked = true;
             }
         }
@@ -122,8 +114,8 @@ namespace BoxMenu
         /// <param name="visible"></param>
         public void SetVisibleAll(bool visible)
         {
-            for (int i = 0; i < buttons.Count; i++)
-                buttons[i].Visible = visible;
+            foreach (AbstractClickableButton button in buttons.Where(x => x is AbstractClickableButton))
+                button.Visible = visible;
         }
 
         /// <summary>
@@ -140,15 +132,15 @@ namespace BoxMenu
         /// </summary>
         public void ToggleVisibleAll()
         {
-            for (int i = 0; i < buttons.Count; i++)
-                buttons[i].Visible = !buttons[i].Visible;
+            foreach (AbstractClickableButton button in buttons.Where(x => x is AbstractClickableButton))
+                button.Visible = !button.Visible;
         }
 
         /// <summary>
         /// Foreach construct.
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<AbstractButton> GetEnumerator()
+        public IEnumerator<AbstractButtonFramework> GetEnumerator()
         {
             for (int i = 0; i < buttons.Count; i++)
                 yield return buttons[i];
@@ -159,7 +151,7 @@ namespace BoxMenu
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public AbstractButton this[int index]
+        public AbstractButtonFramework this[int index]
         {
             get { return buttons[index]; }
         }

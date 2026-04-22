@@ -7,7 +7,7 @@ namespace BoxMenu
     /// <summary>
     /// An invisible, purely functional button.
     /// </summary>
-    public class HiddenButton : AbstractButton
+    public class HiddenButton : AbstractClickableButton
     {
         /// <summary>
         /// 
