@@ -10,7 +10,7 @@ namespace BoxMenu
     /// </summary>
     public class ButtonCollection
     {
-        private List<BoxButton> buttons = new List<BoxButton>();
+        private List<AbstractButton> buttons = new List<AbstractButton>();
         private MouseState nowState, prevState;
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace BoxMenu
         /// Add a button to this collection.
         /// </summary>
         /// <param name="button"></param>
-        public void Add(BoxButton button)
+        public void Add(AbstractButton button)
         {
             buttons.Add(button);
             button.TIMER_MAX = TIMER_MAX;
@@ -56,7 +56,7 @@ namespace BoxMenu
         /// Remove a button from the collection.
         /// </summary>
         /// <param name="button"></param>
-        public void Remove(BoxButton button)
+        public void Remove(AbstractButton button)
         {
             buttons.Remove(button);
         }
@@ -91,7 +91,7 @@ namespace BoxMenu
             // Go in reverse order, so upper buttons block lower buttons.
             for (int i = buttons.Count - 1; i >= 0; i--)
             {
-                if (buttons[i].Update(nowState, blocked, Offset))
+                if (buttons[i].InternalUpdate(nowState, blocked, Offset))
                     blocked = true;
             }
         }
@@ -148,7 +148,7 @@ namespace BoxMenu
         /// Foreach construct.
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<BoxButton> GetEnumerator()
+        public IEnumerator<AbstractButton> GetEnumerator()
         {
             for (int i = 0; i < buttons.Count; i++)
                 yield return buttons[i];
@@ -159,7 +159,7 @@ namespace BoxMenu
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public BoxButton this[int index]
+        public AbstractButton this[int index]
         {
             get { return buttons[index]; }
         }

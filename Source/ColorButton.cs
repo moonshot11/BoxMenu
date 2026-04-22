@@ -8,7 +8,7 @@ namespace BoxMenu
     /// A button whose states are described by different color highlights
     /// over the same Texture2D.
     /// </summary>
-    public class ColorButton : BoxButton
+    public class ColorButton : AbstractButton
     {
         /// <summary>
         /// Texture
@@ -80,7 +80,7 @@ namespace BoxMenu
             }
         }
 
-        internal override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
                 return;

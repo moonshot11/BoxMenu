@@ -7,7 +7,7 @@ namespace BoxMenu
     /// <summary>
     /// A button whose four states are described by four separate Texture2Ds.
     /// </summary>
-    public class ImageButton : BoxButton
+    public class ImageButton : AbstractButton
     {
         private Texture2D inactiveTexture, activeTexture, hoverTexture, clickTexture;
 
@@ -39,7 +39,7 @@ namespace BoxMenu
             currentTexture = activeTexture;
         }
 
-        internal override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
                 return;

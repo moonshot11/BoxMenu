@@ -4,10 +4,17 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BoxMenu
 {
+
+    public enum ActivationCondition
+    {
+        OnPress,
+        OnRelease
+    }
+
     /// <summary>
     /// An abstract button.
     /// </summary>
-    public abstract class BoxButton
+    public abstract class AbstractButton
     {
         internal enum BoxButtonState
         {
@@ -41,10 +48,22 @@ namespace BoxMenu
         /// </summary>
         public bool Visible { get; set; }
 
+        public ActivationCondition ActivationCondition { get; set; }
+
+        internal ButtonCollection soloCollection;
+
+        /// <summary>
+        /// Update only this button. Do not use if also updating button through a ButtonCollection.
+        /// </summary>
+        public void Update()
+        {
+            soloCollection.Update();
+        }
+
         /// <summary>
         /// This event is called when the mouse is clicked while selecting the item.
         /// </summary>
-        internal bool Update(MouseState nowState, bool blocked, Point offset)
+        internal bool InternalUpdate(MouseState nowState, bool blocked, Point offset)
         {
             BoundingBox = new Rectangle(origBoundingBox.Location + offset, origBoundingBox.Size);
 
@@ -53,14 +72,17 @@ namespace BoxMenu
 
             if (state == BoxButtonState.Clicking && clickTimer > 0)
             {
+                if (ActivationCondition == ActivationCondition.OnPress && clickTimer == TIMER_MAX)
+                    actionDelegate?.Invoke(arguments);
+
                 clickTimer--;
                 blocking = true;
 
                 if (clickTimer == 0)
                 {
                     state = BoxButtonState.Active;
-                    if (ad != null)
-                        ad(arguments);
+                    if (ActivationCondition == ActivationCondition.OnRelease)
+                        actionDelegate?.Invoke(arguments);
                 }
             }
 
@@ -80,11 +102,14 @@ namespace BoxMenu
                 {
                     blocking = true;
                     state = BoxButtonState.Clicking;
+                    if (ActivationCondition == ActivationCondition.OnPress)
+                        clickTimer = TIMER_MAX;
                 }
                 else if (state == BoxButtonState.Clicking && nowState.LeftButton == ButtonState.Released)
                 {
                     blocking = true;
-                    clickTimer = TIMER_MAX;
+                    if (ActivationCondition == ActivationCondition.OnRelease)
+                        clickTimer = TIMER_MAX;
                 }
                 else if (contains && nowState.LeftButton == ButtonState.Released)
                 {
@@ -106,7 +131,7 @@ namespace BoxMenu
         /// </summary>
         internal abstract void UpdateAppearance();
 
-        internal abstract void Draw(SpriteBatch spriteBatch);
+        public abstract void Draw(SpriteBatch spriteBatch);
 
         /// <summary>
         /// A delegate with no return type which takes a
@@ -117,17 +142,21 @@ namespace BoxMenu
         /// <summary>
         /// The function to run when clicked.
         /// </summary>
-        private ActionDelegate ad;
+        private ActionDelegate actionDelegate;
 
-        internal BoxButton(Rectangle rectangle,
-            ActionDelegate ad, params object[] arguments)
+        internal AbstractButton(Rectangle rectangle,
+            ActionDelegate actionDelegate, params object[] arguments)
         {
             origBoundingBox = rectangle;
-            this.ad = ad;
 
+            this.actionDelegate = actionDelegate;
             this.arguments = arguments;
+
             Enabled = true;
             Visible = true;
+
+            soloCollection = new ButtonCollection();
+            soloCollection.Add(this);
         }
 
         /// <summary>
