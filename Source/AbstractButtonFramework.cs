@@ -56,6 +56,13 @@ namespace BoxMenu
         internal ButtonCollection soloCollection;
 
         /// <summary>
+        /// True if this button is activated.
+        /// </summary>
+        public bool IsActivated =>
+            ActivationCondition == ActivationCondition.OnPress && state == BoxButtonState.Clicking ||
+            ActivationCondition == ActivationCondition.OnRelease && state != BoxButtonState.Clicking;
+
+        /// <summary>
         /// A delegate with no return type which takes a
         /// "params" array of objects.
         /// </summary>
